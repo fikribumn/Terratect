@@ -1,0 +1,23 @@
+  fisika_omori(logit): 1s
+  fisika_omori(logit)+oof: 4s
+  logistik: 1s
+  logistik+oof: 14s
+  gbm_tanpa_kalibrasi: 14s
+  gbm: 13s
+  gbm+oof: 75s
+  neural_net_mlp: 11s
+  neural_net_mlp+oof: 67s
+
+### A. Perbandingan model (M>=5, 7 hari, sel 1°, uji 1995-2007)
+nama                                     AUC     BSS  alarm  presisi          CI95  recall  episode
+klimatologi                            0.736  +0.000      0        -             -    0.0%    0/0  
+fisika_omori(logit)                    0.733  +0.004      0        -             -    0.0%    0/0  
+fisika_omori(logit)+oof                0.735  +0.006      0        -             -    0.0%    0/0  
+logistik                               0.771  +0.014     39      44%       29%-59%    0.9%    1/1  
+logistik+oof                           0.778  +0.017     65      46%       35%-58%    1.5%    3/3  
+gbm_tanpa_kalibrasi                    0.783  +0.022     78      71%       60%-79%    2.8%    7/7  
+gbm                                    0.767  +0.025      5      80%       38%-96%    0.2%    1/1  
+gbm+oof                                0.783  +0.033     30      83%       66%-93%    1.3%    3/2  
+neural_net_mlp                         0.776  +0.021     12      50%       25%-75%    0.3%    1/1  
+neural_net_mlp+oof                     0.776  +0.019     22      59%       39%-77%    0.7%    1/1  
+ensemble(gbm+mlp+logit)+oof            0.786  +0.030     23      87%       68%-95%    1.0%    1/1  

@@ -1,0 +1,27 @@
+  M>=5.0 1h sel1° selesai
+  M>=5.0 1h sel2° selesai
+  M>=5.0 7h sel1° selesai
+  M>=5.0 7h sel2° selesai
+  M>=5.0 30h sel1° selesai
+  M>=5.0 30h sel2° selesai
+  M>=6.0 1h sel1° selesai
+  M>=6.0 1h sel2° selesai
+  M>=6.0 7h sel1° selesai
+  M>=6.0 7h sel2° selesai
+  M>=6.0 30h sel1° selesai
+  M>=6.0 30h sel2° selesai
+
+### C. Definisi target (GBM + kalibrasi OOF, uji 1995-2007)
+nama                                     AUC     BSS  alarm  presisi          CI95  recall  episode
+M>=5.0 1h sel1°                        0.811  +0.035      1     100%      21%-100%    0.2%    1/1  
+M>=5.0 1h sel2°                        0.782  +0.029     21      62%       41%-79%    1.9%    7/3  
+M>=5.0 7h sel1°                        0.783  +0.033     30      83%       66%-93%    1.3%    3/2  
+M>=5.0 7h sel2°                        0.737  +0.016      1     100%      21%-100%    0.0%    1/1  
+M>=5.0 30h sel1°                       0.761  +0.012     13      46%       23%-71%    0.3%    2/2  
+M>=5.0 30h sel2°                       0.734  -0.001      4     100%      51%-100%    0.2%    1/1  
+M>=6.0 1h sel1°                        0.757  +0.003      0        -             -    0.0%    0/0  
+M>=6.0 1h sel2°                        0.748  +0.011      0        -             -    0.0%    0/0  
+M>=6.0 7h sel1°                        0.731  +0.005      1     100%      21%-100%    0.3%    1/1  
+M>=6.0 7h sel2°                        0.713  -0.001      0        -             -    0.0%    0/0  
+M>=6.0 30h sel1°                       0.662  +0.004      0        -             -    0.0%    0/0  
+M>=6.0 30h sel2°                       0.677  -0.004      0        -             -    0.0%    0/0  

@@ -4,3 +4,4 @@ hasil/cache/
 hasil/**/*.pkl
 hasil/**/test_predictions.csv
 hasil/**/*.npz
+hasil/run_rest.sh

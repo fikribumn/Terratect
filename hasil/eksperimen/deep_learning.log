@@ -1,0 +1,72 @@
+Sekuens dibangun: 628,414 sampel (58s)
+    [gru] epoch 1: val loss 0.04147 (7s)
+    [gru] epoch 2: val loss 0.03870 (7s)
+    [gru] epoch 3: val loss 0.03750 (7s)
+    [gru] epoch 4: val loss 0.03732 (6s)
+    [gru] epoch 5: val loss 0.03728 (7s)
+    [gru] epoch 6: val loss 0.03742 (6s)
+    [gru] epoch 7: val loss 0.03736 (6s)
+    [gru] epoch 8: val loss 0.03735 (6s)
+  gru_murni: 65s
+    [transformer] epoch 1: val loss 0.04217 (35s)
+    [transformer] epoch 2: val loss 0.03875 (34s)
+    [transformer] epoch 3: val loss 0.03655 (35s)
+    [transformer] epoch 4: val loss 0.03632 (34s)
+    [transformer] epoch 5: val loss 0.03624 (36s)
+    [transformer] epoch 6: val loss 0.03618 (36s)
+    [transformer] epoch 7: val loss 0.03619 (36s)
+    [transformer] epoch 8: val loss 0.03630 (37s)
+    [transformer] epoch 9: val loss 0.03613 (35s)
+    [transformer] epoch 10: val loss 0.03600 (37s)
+    [transformer] epoch 11: val loss 0.03594 (36s)
+    [transformer] epoch 12: val loss 0.03592 (36s)
+    [transformer] epoch 13: val loss 0.03588 (35s)
+    [transformer] epoch 14: val loss 0.03580 (37s)
+    [transformer] epoch 15: val loss 0.03573 (37s)
+    [transformer] epoch 16: val loss 0.03569 (37s)
+    [transformer] epoch 17: val loss 0.03567 (38s)
+    [transformer] epoch 18: val loss 0.03551 (35s)
+    [transformer] epoch 19: val loss 0.03569 (36s)
+    [transformer] epoch 20: val loss 0.03570 (38s)
+  transformer_murni: 783s
+    [gru] epoch 1: val loss 0.04280 (7s)
+    [gru] epoch 2: val loss 0.03755 (7s)
+    [gru] epoch 3: val loss 0.03597 (7s)
+    [gru] epoch 4: val loss 0.03561 (6s)
+    [gru] epoch 5: val loss 0.03544 (6s)
+    [gru] epoch 6: val loss 0.03534 (6s)
+    [gru] epoch 7: val loss 0.03528 (7s)
+    [gru] epoch 8: val loss 0.03529 (7s)
+    [gru] epoch 9: val loss 0.03524 (7s)
+    [gru] epoch 10: val loss 0.03513 (7s)
+    [gru] epoch 11: val loss 0.03515 (7s)
+    [gru] epoch 12: val loss 0.03518 (7s)
+    [gru] epoch 13: val loss 0.03521 (7s)
+  gru_hibrida: 98s
+    [transformer] epoch 1: val loss 0.04112 (38s)
+    [transformer] epoch 2: val loss 0.03631 (36s)
+    [transformer] epoch 3: val loss 0.03540 (39s)
+    [transformer] epoch 4: val loss 0.03513 (37s)
+    [transformer] epoch 5: val loss 0.03504 (34s)
+    [transformer] epoch 6: val loss 0.03490 (38s)
+    [transformer] epoch 7: val loss 0.03485 (36s)
+    [transformer] epoch 8: val loss 0.03481 (39s)
+    [transformer] epoch 9: val loss 0.03479 (39s)
+    [transformer] epoch 10: val loss 0.03477 (37s)
+    [transformer] epoch 11: val loss 0.03478 (34s)
+    [transformer] epoch 12: val loss 0.03470 (33s)
+    [transformer] epoch 13: val loss 0.03471 (34s)
+    [transformer] epoch 14: val loss 0.03470 (35s)
+    [transformer] epoch 15: val loss 0.03470 (35s)
+  transformer_hibrida: 604s
+
+### E. Deep learning sekuens vs GBM (M>=5, 7 hari, sel 1°, uji 1995-2007)
+nama                                     AUC     BSS  alarm  presisi          CI95  recall  episode
+klimatologi                            0.736  +0.000      0        -             -    0.0%    0/0  
+gbm (kalibrasi periode)                0.767  +0.025      5      80%       38%-96%    0.2%    1/1  
+gru_murni                              0.708  -0.003      0        -             -    0.0%    0/0  
+transformer_murni                      0.750  +0.023     12      92%       65%-99%    0.6%    1/1  
+gru_hibrida                            0.768  +0.016     17      53%       31%-74%    0.5%    2/2  
+transformer_hibrida                    0.771  +0.015      4      50%       15%-85%    0.1%    2/2  
+gbm+oof                                0.783  +0.033     30      83%       66%-93%    1.3%    3/2  
+ensemble gbm+oof & transformer_hibrida 0.781  +0.032     30      83%       66%-93%    1.3%    3/2  

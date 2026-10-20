@@ -1,0 +1,11 @@
+  uji 1965-1975 selesai
+  uji 1975-1985 selesai
+  uji 1985-1995 selesai
+  uji 1995-2008 selesai
+
+### D. Uji bergulir (GBM + kalibrasi OOF; latih = semua data sebelum periode uji)
+nama                                     AUC     BSS  alarm  presisi          CI95  recall  episode
+uji 1965-1975                          0.792  +0.018     41      49%       34%-64%    1.2%    3/3  
+uji 1975-1985                          0.755  +0.015      0        -             -    0.0%    0/0  
+uji 1985-1995                          0.768  +0.013      0        -             -    0.0%    0/0  
+uji 1995-2008                          0.783  +0.033     30      83%       66%-93%    1.3%    3/2  
