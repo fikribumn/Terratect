@@ -18,8 +18,10 @@ class CalibratedModel:
     sekitar 80% di antaranya memang terjadi (diuji ulang di periode uji).
     """
 
-    def __init__(self, kind: str = "gbm", random_state: int = 0):
+    def __init__(self, kind: str = "gbm", random_state: int = 0, neg_frac: float = 1.0):
         self.kind = kind
+        self.neg_frac = neg_frac
+        self.random_state = random_state
         if kind == "gbm":
             self.base = HistGradientBoostingClassifier(
                 max_iter=400, learning_rate=0.05, max_leaf_nodes=31, min_samples_leaf=40,
@@ -36,8 +38,19 @@ class CalibratedModel:
             raise ValueError(kind)
         self.iso = IsotonicRegression(y_min=0.0, y_max=1.0, out_of_bounds="clip")
 
+    def _fit_base(self, est, X, y):
+        """Latih dengan sebagian sampel negatif (bobot 1/neg_frac) agar cepat tanpa bias peluang."""
+        y = np.asarray(y)
+        if self.neg_frac >= 1.0:
+            return est.fit(X, y)
+        rng = np.random.default_rng(self.random_state)
+        keep = (y == 1) | (rng.random(len(y)) < self.neg_frac)
+        w = np.where(y[keep] == 1, 1.0, 1.0 / self.neg_frac)
+        key = "sample_weight" if self.kind == "gbm" else est.steps[-1][0] + "__sample_weight"
+        return est.fit(X[keep], y[keep], **{key: w})
+
     def fit(self, X_train, y_train, X_cal, y_cal):
-        self.base.fit(X_train, y_train)
+        self._fit_base(self.base, X_train, y_train)
         self.iso.fit(self.base.predict_proba(X_cal)[:, 1], y_cal)
         return self
 
@@ -56,8 +69,8 @@ class OOFCalibratedModel(CalibratedModel):
     ikut menyumbang contoh kalibrasi, lalu model akhir dilatih pada semua data sebelum periode uji.
     """
 
-    def __init__(self, kind="gbm", n_folds=5, random_state=0):
-        super().__init__(kind, random_state)
+    def __init__(self, kind="gbm", n_folds=5, random_state=0, neg_frac=1.0):
+        super().__init__(kind, random_state, neg_frac)
         self.n_folds = n_folds
 
     def fit_oof(self, X, y, t):
@@ -68,10 +81,10 @@ class OOFCalibratedModel(CalibratedModel):
         oof = np.zeros(len(y))
         for k in range(self.n_folds):
             m = fold == k
-            est = clone(self.base).fit(X[~m], y[~m])
+            est = self._fit_base(clone(self.base), X[~m], y[~m])
             oof[m] = est.predict_proba(X[m])[:, 1]
         self.iso.fit(oof, y)
-        self.base.fit(X, y)
+        self._fit_base(self.base, X, y)
         return self
 
 

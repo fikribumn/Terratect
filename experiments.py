@@ -30,6 +30,7 @@ CATALOG = "data/jma_1926_2007_M4.5.csv"
 OUT = "hasil/eksperimen"
 CACHE = "hasil/cache"
 MC = 4.5
+NEG_FRAC = 0.2  # latih dengan 20% sampel negatif (bobot 5x) -> ~5x lebih cepat
 SPLIT = dict(train_end="1985-01-01", cal_end="1995-01-01")
 
 DECAY = ["log_omori", "log_omori_fast", "log_omori_slow", "log_days_since_big"]
@@ -87,14 +88,14 @@ def score(p, te, p_ref, threshold=0.8):
 def fit_predict(kind, calib, cols, ds):
     tr, ca, te = ds["train"], ds["cal"], ds["test"]
     if calib == "isotonik_periode":
-        m = CalibratedModel(kind).fit(tr[cols], tr["y"], ca[cols], ca["y"])
+        m = CalibratedModel(kind, neg_frac=NEG_FRAC).fit(tr[cols], tr["y"], ca[cols], ca["y"])
     elif calib == "isotonik_oof":
         full = pd.concat([tr, ca])
-        m = OOFCalibratedModel(kind).fit_oof(full[cols], full["y"], full["issue_t"])
+        m = OOFCalibratedModel(kind, neg_frac=NEG_FRAC).fit_oof(full[cols], full["y"], full["issue_t"])
     elif calib == "tanpa":
-        m = CalibratedModel(kind)
+        m = CalibratedModel(kind, neg_frac=NEG_FRAC)
         full = pd.concat([tr, ca])
-        m.base.fit(full[cols], full["y"])
+        m._fit_base(m.base, full[cols], full["y"])
         return m.predict_raw(te[cols])
     return m.predict_proba(te[cols])
 
