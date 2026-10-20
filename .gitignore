@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+hasil/cache/
+hasil/**/*.pkl
+hasil/**/test_predictions.csv
+hasil/**/*.npz
