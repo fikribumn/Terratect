@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Eksperimen E: deep learning sekuens (PyTorch) vs GBM pada data uji yang sama.
 
-Input model = urutan 64 gempa terakhir (<= 3 tahun) dalam radius 200 km dari pusat sel:
+Input model = urutan 32 gempa terakhir (<= 3 tahun) dalam radius 200 km dari pusat sel:
   [log waktu lalu, M - Mc, jarak, kedalaman, dlat, dlon, di-sel-sama]
 ditambah fitur statis. Tidak ada fitur waktu luruh buatan tangan pada varian "murni";
 model harus menemukan sendiri pola peluruhan dari urutan event mentah.
@@ -19,14 +19,15 @@ import pandas as pd
 import torch
 from torch import nn
 
-from experiments import (BASE_CFG, CATALOG, GEOLOGY, MC, NEG_FRAC, OUT, climatology, dataset, fit_predict,
+from experiments import (BASE_CFG, CATALOG, GEOLOGY, MC, OUT, climatology, dataset, fit_predict,
                          print_table, score)
 from gempa.data import load_catalog
 from gempa.features import FEATURE_COLUMNS, FeatureConfig
 from gempa.geology import haversine
 from sklearn.isotonic import IsotonicRegression
 
-SEQ_LEN, RADIUS_KM, MAX_AGE = 64, 200.0, 3 * 365.25
+SEQ_LEN, RADIUS_KM, MAX_AGE = 32, 200.0, 3 * 365.25
+DL_NEG_FRAC = 0.05  # CPU saja: latih dengan 5% sampel negatif (bobot 20x)
 torch.set_num_threads(4)
 
 
@@ -59,7 +60,7 @@ def build_sequences(rows: pd.DataFrame, cat: pd.DataFrame, grid):
 
 
 class SeqModel(nn.Module):
-    def __init__(self, n_static, kind="gru", d=64):
+    def __init__(self, n_static, kind="gru", d=32):
         super().__init__()
         self.kind = kind
         self.inp = nn.Sequential(nn.Linear(7, d), nn.GELU())
@@ -104,8 +105,8 @@ def train_model(kind, Xs, Ms, S, y, w, val_frac=0.15, epochs=20, patience=3, see
         model.train()
         perm = torch.randperm(n - n_val)
         t0 = time.time()
-        for b in range(0, len(perm), 512):
-            i = perm[b:b + 512]
+        for b in range(0, len(perm), 1024):
+            i = perm[b:b + 1024]
             loss = (lossf(model(Xt[i], Mt[i], St[i]), yt[i]) * wt[i]).sum() / wt[i].sum()
             opt.zero_grad(); loss.backward(); opt.step()
         model.eval()
@@ -140,8 +141,8 @@ def main():
     cat = cat[cat["mag"] >= MC].reset_index(drop=True)
     tr, ca, te = ds["train"], ds["cal"], ds["test"]
     rng = np.random.default_rng(0)
-    tr = tr[(tr["y"] == 1).to_numpy() | (rng.random(len(tr)) < NEG_FRAC)].sort_values("issue_t")
-    w_tr = np.where(tr["y"] == 1, 1.0, 1.0 / NEG_FRAC)
+    tr = tr[(tr["y"] == 1).to_numpy() | (rng.random(len(tr)) < DL_NEG_FRAC)].sort_values("issue_t")
+    w_tr = np.where(tr["y"] == 1, 1.0, 1.0 / DL_NEG_FRAC)
     t0 = time.time()
     seq = {name: build_sequences(d, cat, ds["grid"]) for name, d in (("tr", tr), ("ca", ca), ("te", te))}
     print(f"Sekuens dibangun: {sum(len(v[0]) for v in seq.values()):,} sampel ({time.time() - t0:.0f}s)", flush=True)
