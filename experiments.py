@@ -183,13 +183,16 @@ def _target_job(args):
 
 def exp_targets():
     jobs = [(m, w, c) for m in (5.0, 6.0) for w in (1.0, 7.0, 30.0) for c in (1.0, 2.0)]
-    rows = {}
-    with ProcessPoolExecutor(max_workers=2) as ex:
-        for name, r in ex.map(_target_job, jobs):
-            rows[name] = r
-            print(f"  {name} selesai", flush=True)
+    path = os.path.join(OUT, "C_targets.json")
+    rows = json.load(open(path)) if os.path.exists(path) else {}
+    for job in jobs:  # berurutan & disimpan per konfigurasi agar bisa dilanjutkan
+        if f"M>={job[0]} {job[1]:g}h sel{job[2]:g}°" in rows:
+            continue
+        name, r = _target_job(job)
+        rows[name] = r
+        save("C_targets", rows)
+        print(f"  {name} selesai", flush=True)
     print_table(rows, "C. Definisi target (GBM + kalibrasi OOF, uji 1995-2007)")
-    save("C_targets", rows)
 
 
 def _rolling_job(split):
