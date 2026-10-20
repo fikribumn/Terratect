@@ -50,12 +50,13 @@ def dataset(cfg: FeatureConfig, split=SPLIT, tag=None):
     """Bangun (atau ambil dari cache) dataset fitur untuk satu konfigurasi."""
     os.makedirs(CACHE, exist_ok=True)
     tag = tag or (f"M{cfg.target_mag}_w{cfg.window_days:g}_c{cfg.cell_deg:g}_s{cfg.step_days:g}"
-                  f"_{split['train_end'][:4]}_{split['cal_end'][:4]}")
+                  f"_{split['train_end'][:4]}_{split['cal_end'][:4]}" + (f"_{split['test_end'][:4]}" if split.get("test_end") else ""))
     path = os.path.join(CACHE, tag + ".pkl")
     if os.path.exists(path):
         with open(path, "rb") as f:
             return pickle.load(f)
-    ds = build_dataset(CATALOG, cfg, mc=MC, verbose=False, **split)
+    ds = build_dataset(CATALOG, cfg, train_end=split["train_end"], cal_end=split["cal_end"], mc=MC,
+                       end_date=split.get("test_end"), verbose=False)
     ds.pop("cat")
     with open(path, "wb") as f:
         pickle.dump(ds, f)
@@ -195,10 +196,6 @@ def _rolling_job(split):
     ds = dataset(FeatureConfig(**BASE_CFG), split=split)
     te = ds["test"]
     end = split.get("test_end")
-    if end:
-        from gempa.data import to_days
-        te = te[te["issue_t"] + 7 <= to_days(end)]
-        ds["test"] = te
     ref = climatology(ds)
     name = f"uji {split['cal_end'][:4]}-{(end or '2008')[:4]}"
     return name, score(fit_predict("gbm", "isotonik_oof", FEATURE_COLUMNS, ds), te, ref)
